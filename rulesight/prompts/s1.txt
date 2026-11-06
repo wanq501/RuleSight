@@ -1,0 +1,1 @@
+Setting S1. Device: {device}. Defect types to consider: {type_list}. Exemplar images follow, each labelled with its defect type (or "no defect"). Use them as references, then report defects in the JSON format for the target screenshot (the first image).

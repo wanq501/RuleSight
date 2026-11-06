@@ -1,0 +1,50 @@
+{
+ "haiku|s0": {
+  "n": 1837,
+  "up": 786,
+  "down": 396,
+  "share": 66.5
+ },
+ "sonnet55|s0": {
+  "n": 200,
+  "up": 81,
+  "down": 46,
+  "share": 63.8
+ },
+ "gpt54mini|s0": {
+  "n": 200,
+  "up": 26,
+  "down": 37,
+  "share": 41.3
+ },
+ "gemini38flash|s0": {
+  "n": 200,
+  "up": 31,
+  "down": 60,
+  "share": 34.1
+ },
+ "qwen3vl8b|s0": {
+  "n": 1837,
+  "up": 139,
+  "down": 82,
+  "share": 62.9
+ },
+ "internvl35|s0": {
+  "n": 200,
+  "up": 27,
+  "down": 76,
+  "share": 26.2
+ },
+ "haiku|bcot": {
+  "n": 200,
+  "up": 78,
+  "down": 44,
+  "share": 63.9
+ },
+ "haiku|s1": {
+  "n": 200,
+  "up": 108,
+  "down": 23,
+  "share": 82.4
+ }
+}

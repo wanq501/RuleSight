@@ -1,0 +1,9 @@
+numpy>=1.26
+pillow>=10
+matplotlib>=3.8
+# running the oracle on new screenshots additionally needs
+paddlepaddle>=2.6
+paddleocr>=2.8
+huggingface_hub>=0.24
+pyarrow>=14
+playwright>=1.47

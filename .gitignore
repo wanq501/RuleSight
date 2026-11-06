@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+runs/
+figures/out/
+rulesight/bundled/*.csv

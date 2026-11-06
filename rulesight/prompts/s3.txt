@@ -1,0 +1,7 @@
+Setting S3 (RuleSight). Device: {device}. Rule cards:
+{rule_cards}
+Measurement table for the target screenshot (deterministic tools; pixel coordinates of the first image):
+{measurements}
+Tool candidates (regions the measurements flag; a crop of each follows the screenshot):
+{candidates}
+Procedure: (1) judge every candidate against its rule card and its crop, and keep the ones that are real defects (set "candidate" to its id); (2) then inspect the screenshot and its high-resolution tiles region by region and add any defect the tools missed ("candidate": null); (3) for each defect give the rule id, one sentence of evidence (what is seen, and the measurement row or candidate that supports it), and a calibrated confidence: 0.9 clearly visible, 0.6 likely, 0.3 doubtful. A deliberate design (a modal, a menu, a badge meant to float, a title that is meant to be shortened) is not a defect. Report in the JSON format for the target screenshot (the first image).

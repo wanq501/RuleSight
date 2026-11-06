@@ -1,0 +1,3 @@
+Setting S2. Device: {device}. Rule cards:
+{rule_cards}
+Exemplar images follow, each with its label. Apply the rules to the target screenshot (the first image) and report defects in the JSON format, citing the rule id for each.

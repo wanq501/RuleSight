@@ -1,0 +1,405 @@
+{
+ "name": "RuleKB-GUI",
+ "version": "2.2+ui-lens-aligned",
+ "built": "2026-10-31",
+ "rules": [
+  {
+   "id": "D1",
+   "name": "Text overlap",
+   "group": "display",
+   "definition": "Two independent text runs are drawn over each other because of their positioning, so glyphs of one obscure the other. If one text spills out of its own box onto the other, report D6 instead.",
+   "visual_cues": [
+    "glyphs crossing other glyphs",
+    "two baselines inside one line box",
+    "illegible characters where two strings meet"
+   ],
+   "measurements": [
+    "ocr_boxes"
+   ],
+   "decision": "intersection-over-smaller of two OCR boxes >= 0.15 and the boxes belong to different text runs",
+   "threshold": {
+    "ios_min": 0.15
+   },
+   "evidence_required": "geometric",
+   "source": "OwlEye / Nighthawk category 'text overlap'"
+  },
+  {
+   "id": "D2",
+   "name": "Component or container overlap",
+   "group": "display",
+   "definition": "Two components or containers overlap so that one covers part of the other (content, a control or its border), and the covering one is not a deliberate floating layer such as a modal, menu, toast or tooltip. Not D2: text that spills over its own box across a neighbour (D6); content cut away by an edge (D8).",
+   "visual_cues": [
+    "a button or card cut by another box",
+    "text or icon partly hidden"
+   ],
+   "measurements": [
+    "element_boxes"
+   ],
+   "decision": "two element boxes intersect with IoS >= 0.2, neither contains the other, and the covered one carries content, text or a control; or the screenshot shows one card, panel or control drawn over another",
+   "threshold": {
+    "ios_min": 0.2
+   },
+   "evidence_required": "geometric",
+   "source": "OwlEye / Nighthawk category 'component occlusion'"
+  },
+  {
+   "id": "D3",
+   "name": "Missing or undisplayed content",
+   "group": "display",
+   "definition": "Content that should be shown is not: an image slot, list, card or section renders empty, as a uniform placeholder, a broken-image icon or a blank area where the layout expects content.",
+   "visual_cues": [
+    "grey or white rectangle where an image is expected",
+    "broken-image icon",
+    "alt text shown in an image frame"
+   ],
+   "measurements": [
+    "element_boxes",
+    "placeholder_detector"
+   ],
+   "decision": "an image-shaped or content-shaped region is uniform (std < 6) where content is expected, or shows a broken-image glyph or a loading placeholder in a settled screen",
+   "threshold": {
+    "std_max": 6
+   },
+   "evidence_required": "geometric_or_visual",
+   "source": "OwlEye / Nighthawk category 'missing image'"
+  },
+  {
+   "id": "D4",
+   "name": "Null value",
+   "group": "display",
+   "definition": "A field shows a programming placeholder instead of data.",
+   "visual_cues": [
+    "null",
+    "undefined",
+    "NaN",
+    "{{ }}",
+    "%s",
+    "Lorem ipsum"
+   ],
+   "measurements": [
+    "ocr_text"
+   ],
+   "decision": "OCR text matches the null-value pattern list",
+   "threshold": {
+    "patterns": [
+     "\\bnull\\b",
+     "\\bundefined\\b",
+     "\\bNaN\\b",
+     "\\{\\{.*\\}\\}",
+     "%[sd]",
+     "\\[object Object\\]",
+     "lorem ipsum"
+    ]
+   },
+   "evidence_required": "textual",
+   "source": "OwlEye / Nighthawk category 'null value'"
+  },
+  {
+   "id": "D5",
+   "name": "Blurred or torn screen",
+   "group": "display",
+   "definition": "Rendering corruption such as tearing, smearing, duplicated bands or a blurred region.",
+   "visual_cues": [
+    "horizontal shear line",
+    "repeated band",
+    "smeared colours"
+   ],
+   "measurements": [
+    "row_correlation"
+   ],
+   "decision": "model judgement, supported when adjacent-row correlation drops below 0.3 along a band of >= 8 px",
+   "threshold": {
+    "corr_min": 0.3,
+    "band_px": 8
+   },
+   "evidence_required": "visual",
+   "source": "OwlEye / Nighthawk category 'blurred screen'"
+  },
+  {
+   "id": "D6",
+   "name": "Text overflow",
+   "group": "display",
+   "definition": "Text is drawn beyond the boundary of its container or across neighbouring text or elements, with its glyphs still fully visible: it spills over instead of wrapping or being shortened. If part of the text is cut away at an edge, that is D8 (cropped content), not D6.",
+   "visual_cues": [
+    "half characters at a box edge",
+    "text spilling out of a button or card",
+    "a label wider than its container"
+   ],
+   "measurements": [
+    "ocr_boxes",
+    "element_boxes"
+   ],
+   "decision": "an OCR text box extends past its container or into an adjacent element while the glyphs at the boundary are intact",
+   "threshold": {
+    "overflow_px": 2
+   },
+   "evidence_required": "geometric",
+   "source": "UI-Lens 'Text Overflow'; 2026 multi-window GUI defect study"
+  },
+  {
+   "id": "D7",
+   "name": "Abnormal text ellipsis",
+   "group": "display",
+   "definition": "Text is shortened with an ellipsis where the full text was meant to be visible (a title, a price, a button label), or the ellipsis itself is misplaced. Report D7 for such text even if it also looks cut or overflowing.",
+   "visual_cues": [
+    "'...' or '…' on a short label",
+    "an ellipsis inside a button",
+    "a number or price ending in an ellipsis"
+   ],
+   "measurements": [
+    "ocr_text",
+    "ocr_boxes",
+    "element_boxes"
+   ],
+   "decision": "OCR text ends with an ellipsis while the containing element has free width (>= 15% of the text width) or the element is a button, title, price or amount",
+   "threshold": {
+    "free_width_ratio": 0.15
+   },
+   "evidence_required": "textual",
+   "source": "UI-Lens 'Abnormal Text Ellipsis'"
+  },
+  {
+   "id": "D8",
+   "name": "Cropped content",
+   "group": "display",
+   "definition": "Part of the content is cut away by its container or the screen edge and is not drawn at all: text with glyphs sliced at the edge, or an image, icon, card or control with a straight cut through it. A cut text is D8 (not D6).",
+   "visual_cues": [
+    "an image or card with one side cut flat",
+    "an icon half outside its tile",
+    "a component touching the screen edge with content missing"
+   ],
+   "measurements": [
+    "element_boxes"
+   ],
+   "decision": "glyphs or an image are sliced along a straight edge of the container or the screen, or an element box extends beyond its parent by >= 4 px with the part outside not drawn",
+   "threshold": {
+    "overflow_px": 4
+   },
+   "evidence_required": "geometric",
+   "source": "UI-Lens 'Cropped Content'"
+  },
+  {
+   "id": "E1",
+   "name": "Text contrast",
+   "group": "ergonomic",
+   "definition": "Contrast ratio between text and its background is below the level required for its size.",
+   "measurements": [
+    "contrast_ratio",
+    "text_size_pt"
+   ],
+   "decision": "contrast < 4.5 for normal text, < 3.0 for large text (>= 18 pt or 14 pt bold)",
+   "threshold": {
+    "normal_min": 4.5,
+    "large_min": 3.0,
+    "large_pt": 18,
+    "large_bold_pt": 14
+   },
+   "evidence_required": "measurement",
+   "source": "WCAG 2.2 SC 1.4.3"
+  },
+  {
+   "id": "E2",
+   "name": "Non-text contrast",
+   "group": "ergonomic",
+   "definition": "Boundaries of controls or graphical objects have contrast below 3:1 against adjacent colours.",
+   "measurements": [
+    "contrast_ratio"
+   ],
+   "decision": "contrast < 3.0 for a control boundary or an informative graphic",
+   "threshold": {
+    "min": 3.0
+   },
+   "evidence_required": "measurement",
+   "source": "WCAG 2.2 SC 1.4.11"
+  },
+  {
+   "id": "E3",
+   "name": "Character visual angle",
+   "group": "ergonomic",
+   "definition": "Character height subtends too small a visual angle at the viewing distance.",
+   "measurements": [
+    "text_px",
+    "ppi",
+    "distance_mm"
+   ],
+   "decision": "x-height visual angle < 16 arcmin (20 arcmin recommended) at the device viewing distance",
+   "threshold": {
+    "min_arcmin": 16,
+    "recommended_arcmin": 20
+   },
+   "evidence_required": "measurement",
+   "source": "ISO 9241-303"
+  },
+  {
+   "id": "E4",
+   "name": "Touch target size",
+   "group": "ergonomic",
+   "definition": "A touch target is smaller than the platform minimum.",
+   "measurements": [
+    "element_boxes",
+    "ppi"
+   ],
+   "decision": "target shorter than 44 pt (iOS) / 48 dp (Material) on a touch device, 24 CSS px minimum on any pointer (WCAG 2.5.8)",
+   "threshold": {
+    "ios_pt": 44,
+    "material_dp": 48,
+    "wcag_px": 24
+   },
+   "evidence_required": "measurement",
+   "source": "Apple HIG, Material 3, WCAG 2.2 SC 2.5.8"
+  },
+  {
+   "id": "E5",
+   "name": "Reflow at 320 px",
+   "group": "ergonomic",
+   "definition": "Content requires two-dimensional scrolling or is clipped at a 320 CSS px wide viewport.",
+   "measurements": [
+    "page_width_320",
+    "horizontal_overflow"
+   ],
+   "decision": "horizontal scroll width > 320 px or content clipped at the viewport edge",
+   "threshold": {
+    "viewport_px": 320
+   },
+   "evidence_required": "measurement",
+   "source": "WCAG 2.2 SC 1.4.10"
+  },
+  {
+   "id": "E6",
+   "name": "Target spacing",
+   "group": "ergonomic",
+   "definition": "Adjacent targets are too close to tap reliably.",
+   "measurements": [
+    "element_boxes",
+    "ppi"
+   ],
+   "decision": "edge-to-edge spacing of two interactive targets < 8 dp when either target is under 48 dp",
+   "threshold": {
+    "min_dp": 8,
+    "small_target_dp": 48
+   },
+   "evidence_required": "measurement",
+   "source": "Material 3, WCAG 2.2 SC 2.5.8"
+  },
+  {
+   "id": "E7",
+   "name": "Colour vision",
+   "group": "ergonomic",
+   "definition": "Information conveyed by colour alone is lost under deuteranopia or protanopia.",
+   "measurements": [
+    "cvd_simulation",
+    "contrast_ratio"
+   ],
+   "decision": "after Brettel simulation the distinguishing colour pair has deltaE00 < 11 and no secondary cue exists",
+   "threshold": {
+    "deltaE_min": 11
+   },
+   "evidence_required": "measurement",
+   "source": "WCAG 2.2 SC 1.4.1, Brettel et al. 1997"
+  },
+  {
+   "id": "E8",
+   "name": "Ambient light contrast",
+   "group": "ergonomic",
+   "definition": "Under 10,000 lx daylight the effective contrast of text falls below the readable level.",
+   "measurements": [
+    "glare_simulation",
+    "contrast_ratio"
+   ],
+   "decision": "effective contrast after the glare model < 3.0 for body text",
+   "threshold": {
+    "min": 3.0,
+    "lux": 10000
+   },
+   "evidence_required": "measurement",
+   "source": "ISO 9241-307, ErgoLens glare model"
+  }
+ ],
+ "exemplars_note": "Exemplars live under rulekb/exemplars/<rule_id>/ (2 positive, 2 negative each) and come only from S-Night and ErgoHMI, never from Test-Real.",
+ "device_defaults": {
+  "desktop": {
+   "ppi": 92,
+   "distance_mm": 600,
+   "lux": 500,
+   "cvd": "none"
+  },
+  "tablet": {
+   "ppi": 264,
+   "distance_mm": 400,
+   "lux": 500,
+   "cvd": "none"
+  },
+  "phone": {
+   "ppi": 460,
+   "distance_mm": 300,
+   "lux": 500,
+   "cvd": "none"
+  },
+  "phone_daylight": {
+   "ppi": 460,
+   "distance_mm": 300,
+   "lux": 10000,
+   "cvd": "none"
+  },
+  "tablet_cvd": {
+   "ppi": 264,
+   "distance_mm": 400,
+   "lux": 500,
+   "cvd": "deuteranopia"
+  }
+ },
+ "category_map": {
+  "UI-Lens": {
+   "Text Overflow": [
+    "D6"
+   ],
+   "Cropped Content": [
+    "D8"
+   ],
+   "Container Overlap": [
+    "D1",
+    "D2"
+   ],
+   "Undisplayed Content": [
+    "D3",
+    "D4"
+   ],
+   "Abnormal Text Ellipsis": [
+    "D7"
+   ]
+  },
+  "UICrit": {
+   "contrast": [
+    "E1",
+    "E2"
+   ],
+   "small text": [
+    "E3"
+   ],
+   "small target": [
+    "E4"
+   ],
+   "spacing": [
+    "E6"
+   ],
+   "overlap/cut-off": [
+    "D1",
+    "D2",
+    "D6",
+    "D8"
+   ]
+  },
+  "GLIB": {
+   "display issue": [
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D6",
+    "D7",
+    "D8"
+   ]
+  }
+ }
+}

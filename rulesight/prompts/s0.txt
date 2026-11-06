@@ -1,0 +1,1 @@
+Setting S0. Device: {device}. Defect types to consider: {type_list}. Inspect the screenshot and report defects in the JSON format.

@@ -1,0 +1,1 @@
+Setting B-CoT. Device: {device}. Defect types to consider: {type_list}. First reason step by step about what a user would see, region by region, in a field "analysis" (plain text), then give the JSON object as the last line.
